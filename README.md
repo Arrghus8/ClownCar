@@ -1,5 +1,9 @@
 # ClownCar
-Clown Car is an Arduino Nano ESP32 + OTG adapter that changes profiles for the RT4K based on gameID.
+Clown Car is an Arduino Nano ESP32 + OTG adapter that changes profiles for the RT4K based on gameID. <br />
+
+<img width="500" src=https://github.com/user-attachments/assets/4a560cfe-95f1-4e88-9f77-3f6dc569a9a4><br />
+
+
 
 See it in action: https://youtu.be/ldbfFbKzjh8
 
