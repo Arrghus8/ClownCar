@@ -41,11 +41,14 @@ I recommend the [Official Arduino IDE and guide](https://www.arduino.cc/en/Guide
   - If a Library is missing, it's usually available through the built-in Library Manager under "Tools" -> "Manage Libraries..."
   - <EspUsbHostSerial_FTDI.h>  Follow these steps to add EspUsbHostSerial_FTDI.h
     - Goto https://github.com/wakwak-koba/EspUsbHost
-    - Click the GREEN "<> Code" box and "Download ZIP"
+    - Click the <code style="color : green">GREEN</code> "<> Code" box and "Download ZIP"
     - In Arudino IDE; goto "Sketch" -> "Include Library" -> "Add .ZIP Library"
    
 
-**To put the Nano ESP32 into programming mode** you must double-click the button on top right after connecting the usb-c cable. You will see the green led strobe if successful. TLDR is: Because ClownCar takes over the usb port, this resets that.
+**To put the Nano ESP32 into programming mode** 
+ - Double-click the button on top right after connecting the usb-c cable.
+ - You will see the <code style="color : green">GREEN</code> led strobe if successful.
+ - TLDR is: Because ClownCar takes over the usb port, this resets that.
 
 ## General Setup
 
