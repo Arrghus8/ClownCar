@@ -35,6 +35,17 @@ You can disable the <code style="color : blue">BLUE</code> / <code style="color 
  //pinMode(LED_GREEN, OUTPUT);
  //pinMode(LED_BLUE, OUTPUT);
 ```
+## Programming the Arduino Nano ESP32
+I recommend the [Official Arduino IDE and guide](https://www.arduino.cc/en/Guide) if you're unfamiliar with Arduinos. All .ino files used for programming are listed above. The following Libraries will also need to be added in order to Compile successfully.<br />
+- **Libraries:**
+  - If a Library is missing, it's usually available through the built-in Library Manager under "Tools" -> "Manage Libraries..."
+  - <EspUsbHostSerial_FTDI.h>  Follow these steps to add EspUsbHostSerial_FTDI.h
+    - Goto https://github.com/wakwak-koba/EspUsbHost
+    - Click the GREEN "<> Code" box and "Download ZIP"
+    - In Arudino IDE; goto "Sketch" -> "Include Library" -> "Add .ZIP Library"
+   
+
+**To put the Nano ESP32 into programming mode** you must double-click the button on top right after connecting the usb-c cable. TLDR is: Because ClownCar takes over the usb port, this resets that.
 
 ## General Setup
 
