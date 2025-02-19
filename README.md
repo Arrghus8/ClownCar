@@ -6,8 +6,15 @@ Clown Car is an Arduino Nano ESP32 + OTG adapter that changes profiles for the R
 
 
 See it in action: https://youtu.be/ldbfFbKzjh8
+<br /><br />
 
-### gameID devices currently supported
+## Parts used:
+  - **OTG Adapter:** https://www.aliexpress.us/item/3256806692568661.html
+ (not all OTG adapters work, this is the one I used)
+  - **Arduino Nano ESP32:** https://www.amazon.com/dp/B0CXHZXJXP
+ <br /><br />
+
+## gameID devices currently supported
 | **Device**    | Supported | Notes |
 | ------------- | ------------- |------------- |
 |PS1Digital | yes, confirmed first hand | |
@@ -28,13 +35,9 @@ You can disable the <code style="color : blue">BLUE</code> / <code style="color 
  //pinMode(LED_BLUE, OUTPUT);
 ```
 
-### Parts used:
- **OTG Adapter:** https://www.aliexpress.us/item/3256806692568661.html
- (not all OTG adapters work, this is the one I used)
+## General Setup
 
- **Arduino Nano ESP32:** https://www.amazon.com/dp/B0CXHZXJXP
-
-### *** At the moment it takes about 35 seconds to "boot". Just be aware when you don't see any activity at first. ***
+*** At the moment it takes about 35 seconds to "boot". Just be aware when you don't see any activity at first. ***
 
 If you have multiple gameID consoles on when the Clown Car (CC) is booting, the console furthest up the "consoles" list wins. After that it keeps track of the order.
 
