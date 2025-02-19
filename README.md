@@ -13,7 +13,7 @@ If you have multiple gameID consoles on when the Clown Car (CC) is booting, the 
 
 There are a multiple moving parts with this setup, and if you have issues, please use the "ClownCar_usb-only-test.ino". More info in the troublehshooting section at the end.
 
-#### I believe you the only library you need to add is a fork of "EspUsbHost"
+#### I believe the only library you need to add is a fork of "EspUsbHost"
 Go to: https://github.com/wakwak-koba/EspUsbHost 
  - Click the GREEN "<> Code" box and "Download ZIP"
  - In the Arudino IDE; goto "Sketch" -> "Include Library" -> "Add .ZIP Library"
