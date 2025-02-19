@@ -26,7 +26,6 @@
 
 WiFiMulti wifiMulti;
 
-// sendRTwake global variables
 uint16_t currentProf[2] = {1,0};  // first index: 0 = remote button profile,1 = SVS profiles. second index: profile number
 unsigned long currentGameTime = 0;
 unsigned long prevGameTime = 0;
