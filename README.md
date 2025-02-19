@@ -7,6 +7,27 @@ Clown Car is an Arduino Nano ESP32 + OTG adapter that changes profiles for the R
 
 See it in action: https://youtu.be/ldbfFbKzjh8
 
+### gameID devices currently supported
+| **Device**    | Supported | Notes |
+| ------------- | ------------- |------------- |
+|PS1Digital | yes, confirmed first hand | |
+|N64Digital | yes, confirmed first hand | |
+| MemCardPro 2 | yes, for GameCube, betting the same for PS |
+| more on the way... |  
+
+### LED activity:
+| **Color**    | Blinking | On | Notes |
+| ------------- | ------------- |------------- |------------- |
+|<code style="color : blue">BLUE</code> | WiFi active, querying gameID addresses| long slow blinks is unsuccessful query of gameID address. A powered off console in the list.| |
+|<code style="color : green">GREEN</code> | 1 second blink is gameID match found and SVS profile being sent to RT4K | |  | 
+|<code style="color : red">RED</code> | | Power| I will try my best to dim this. May just need to cover with tape. |
+
+You can disable the <code style="color : blue">BLUE</code> / <code style="color : green">GREEN</code> LEDs by commenting out the following lines in the .ino:
+```
+ //pinMode(LED_GREEN, OUTPUT);
+ //pinMode(LED_BLUE, OUTPUT);
+```
+
 ### Parts used:
  **OTG Adapter:** https://www.aliexpress.us/item/3256806692568661.html
  (not all OTG adapters work, this is the one I used)
@@ -43,6 +64,10 @@ WiFi is listed just below. Replace SSID and password with your network's. I beli
 wifiMulti.addAP("SSID","password");
 ```
 <br />
+
+## Thank you!
+ - Thanks to https://github.com/wakwak-koba for his fork of the EspUsbHost library. Without it, it would have taken much longer to figure out the usb communication bits.
+  - Huge thanks to @CielFricker249 / "Aru" on the RetroTink discord for the idea and testing of the Donut Dongle project as well!
 
 ## TroubleShooting ##
 First make sure of the following:
