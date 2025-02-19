@@ -20,6 +20,7 @@ See it in action: https://youtu.be/ldbfFbKzjh8
 |PS1Digital | yes, confirmed first hand | |
 |N64Digital | yes, confirmed first hand | |
 | MemCardPro 2 | yes, for GameCube, betting the same for PS |
+| Fenrir ?| | pls, someone make this happen :)|
 | more on the way... |  
 
 ### LED activity:
@@ -27,7 +28,7 @@ See it in action: https://youtu.be/ldbfFbKzjh8
 | ------------- | ------------- |------------- |------------- |
 |<code style="color : blue">BLUE</code> | WiFi active, querying gameID addresses| long slow blinks is unsuccessful query of gameID address. A powered off console in the list.| |
 |<code style="color : green">GREEN</code> | 1 second blink is gameID match found and SVS profile being sent to RT4K | |  | 
-|<code style="color : red">RED</code> | | Power| I will try my best to dim this. May just need to cover with tape. |
+|<code style="color : red">RED</code> | | Power| No way to control as it's hardwired in. May just need to cover with tape. |
 
 You can disable the <code style="color : blue">BLUE</code> / <code style="color : green">GREEN</code> LEDs by commenting out the following lines in the .ino:
 ```
@@ -37,9 +38,9 @@ You can disable the <code style="color : blue">BLUE</code> / <code style="color 
 
 ## General Setup
 
-*** At the moment it takes about 35 seconds to "boot". Just be aware when you don't see any activity at first. ***
+*** At the moment it takes about 25 seconds to "boot". Just be aware when you don't see any activity at first. ***
 
-If you have multiple gameID consoles on when the Clown Car (CC) is booting, the console furthest up the "consoles" list wins. After that it keeps track of the order.
+If you have multiple gameID consoles on when the ClownCar is booting, the console furthest up the "consoles" list wins. After that it keeps track of the order.
 
 There are a multiple moving parts with this setup, and if you have issues, please use the "ClownCar_usb-only-test.ino". More info in the troublehshooting section at the end.
 
@@ -52,7 +53,7 @@ Go to: https://github.com/wakwak-koba/EspUsbHost
 
 ## Adding gameIDs
 
-Edit the .ino file to include your gameID addresses and gameID to SVS profile matches.
+Edit the .ino file to include your gameID addresses and gameID to SVS profile matches. Chances are if this isn't done correctly, it won't compile... which is a good way to know. :)
 ```
 Console consoles[] = {{"http://ps1digital.local/gameid",0,0,0}, // you can add more, but stay in this format
                       {"http://n64digital.local/gameid",0,0,0}
@@ -74,16 +75,20 @@ wifiMulti.addAP("SSID","password");
   - Huge thanks to @CielFricker249 / "Aru" on the RetroTink discord for the idea and testing of the Donut Dongle project as well!
 
 ## TroubleShooting ##
-First make sure of the following:
+
+The GREEN and BLUE leds indicate WiFi and usb serial/gameID lookup respectively. This should help diagnose as a first step.
+
+After that, confirm the following:
  - Configured Wifi settings in .ino.
     - Make sure it's to a 2.4Ghz Wifi AP. I don't believe 5Ghz is supported on the Arduino.
  - Have at least 1 gameID to profile in the gameDB
  - Have at least 1 address in the consoles db that you can access with a web browser
 
- If you are sure of these settings, and it still does not work, try the following:
+ If you are sure of these settings, and it still does not work, try the following to test the usb serial connection:
   - Configure your Arduino Nano ESP32 with the provided "ClownCar_usb-only-test.ino". This is configured to only load "remote profile 8".
+    - You can change the 8 to 1 - 9 if needed.
   - Verify that everything is connected with your OTG adapter and has power.
-  - Press the reset button on top of the Arduino and within a couple of seconds it should load remote profile 8.
+  - Press the reset button on top of the Arduino and within a couple of seconds it should load the remote profile.
 
     If this works, then there must be a wifi connectivity issue somewhere. 
 
