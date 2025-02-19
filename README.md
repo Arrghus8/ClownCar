@@ -47,7 +47,7 @@ Go to: https://github.com/wakwak-koba/EspUsbHost
 
 <br />
 
-------------
+## Adding gameIDs
 
 Edit the .ino file to include your gameID addresses and gameID to SVS profile matches.
 ```
@@ -59,6 +59,7 @@ String gameDB[][2] = {{"00000000-00000000---00","7"}, // 7 is for S7_profilename
                       {"XSTATION","8"},               // XSTATION is the gameID from http://ps1digital.local/gameid
                       {"SCUS-94300","9"}};
 ```
+## WiFi setup
 WiFi is listed just below. Replace SSID and password with your network's. I believe it only works with 2.4Ghz WiFi. Make sure to not leave out the "" "" quotes.
 ```
 wifiMulti.addAP("SSID","password");
