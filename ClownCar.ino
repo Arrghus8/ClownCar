@@ -30,6 +30,7 @@ uint16_t currentProf[2] = {1,0};  // first index: 0 = remote button profile,1 = 
 unsigned long currentGameTime = 0;
 unsigned long prevGameTime = 0;
 
+
 class SerialFTDI : public EspUsbHostSerial_FTDI {
   public:
   String cprof = "null";
@@ -48,11 +49,13 @@ class SerialFTDI : public EspUsbHostSerial_FTDI {
       }
       else if(cprof != "null" && currentProf[0] == 1 && currentProf[1] != cprof.toInt()){
         currentProf[1] = cprof.toInt();
+        analogWrite(LED_GREEN,222);
         tcprof = "SVS NEW INPUT=" + cprof + "\r";
         submit((uint8_t *)reinterpret_cast<const uint8_t*>(&tcprof[0]), tcprof.length());
         delay(1000);
         tcprof = "SVS CURRENT INPUT=" + cprof + "\r";
         submit((uint8_t *)reinterpret_cast<const uint8_t*>(&tcprof[0]), tcprof.length());
+        analogWrite(LED_GREEN,255);
 
       }
     }
@@ -95,6 +98,12 @@ void setup(){
 
   usbHost.begin(115200); // leave at 115200 for RT4K connection
 
+  pinMode(LED_GREEN, OUTPUT); // GREEN led lights up for 1 second when a SVS profile is sent
+  pinMode(LED_BLUE, OUTPUT); // BLUE led is a WiFi activity. Long periods of blue means one of the gameID servers is not connecting.
+  analogWrite(LED_GREEN,255);
+  analogWrite(LED_BLUE,255);
+  
+
 }  // end of setup
 
 void loop(){
@@ -121,6 +130,7 @@ void readGameID(){ // queries addresses in "consoles" array for gameIDs
   for(int i = 0; i < consolelen; i++){
     //result = 0;
     if((wifiMulti.run() == WL_CONNECTED)){ // wait for WiFi connection
+      analogWrite(LED_BLUE,222);
       HTTPClient http;
       http.begin(consoles[i].Address);
       int httpCode = http.GET();             // start connection and send HTTP header
@@ -179,6 +189,7 @@ void readGameID(){ // queries addresses in "consoles" array for gameIDs
         } // end of if()      
       } // end of else()
     http.end();
+    analogWrite(LED_BLUE, 255);
     }  // end of WiFi connection
   }
 }  // end of readGameID()
