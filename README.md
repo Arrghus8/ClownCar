@@ -78,7 +78,7 @@ String gameDB[][2] = {{"00000000-00000000---00","7"}, // 7 is for S7_profilename
                       {"SCUS-94300","9"}};
 ```
 ## WiFi setup
-WiFi is listed just below. Replace SSID and password with your network's. I believe it only works with 2.4Ghz WiFi. Make sure to not leave out the "" "" quotes.
+WiFi is listed just below. **ONLY** compatible with **2.4GHz** WiFi APs. Replace SSID and password with your network's. Make sure to not leave out the "" "" quotes.
 ```
 wifiMulti.addAP("SSID","password");
 ```
@@ -94,7 +94,7 @@ The GREEN and BLUE leds indicate WiFi and usb serial/gameID lookup respectively.
 
 After that, confirm the following:
  - Configured Wifi settings in .ino.
-    - Make sure it's to a 2.4Ghz Wifi AP. I don't believe 5Ghz is supported on the Arduino.
+    - Make sure it's to a **2.4GHz** Wifi AP. **5GHz is NOT supported** by the Arduino Nano ESP32.
  - Have at least 1 gameID to profile in the gameDB
  - Have at least 1 address in the consoles db that you can access with a web browser
 
