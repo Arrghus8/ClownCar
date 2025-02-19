@@ -45,7 +45,7 @@ I recommend the [Official Arduino IDE and guide](https://www.arduino.cc/en/Guide
     - In Arudino IDE; goto "Sketch" -> "Include Library" -> "Add .ZIP Library"
    
 
-**To put the Nano ESP32 into programming mode** you must double-click the button on top right after connecting the usb-c cable. TLDR is: Because ClownCar takes over the usb port, this resets that.
+**To put the Nano ESP32 into programming mode** you must double-click the button on top right after connecting the usb-c cable. You will see the green led strobe if successful. TLDR is: Because ClownCar takes over the usb port, this resets that.
 
 ## General Setup
 
