@@ -7,6 +7,12 @@ Clown Car is an Arduino Nano ESP32 + OTG adapter that changes profiles for the R
 
 See it in action: https://youtu.be/ldbfFbKzjh8
 
+### Parts used:
+ **OTG Adapter:** https://www.aliexpress.us/item/3256806692568661.html
+ (not all OTG adapters work, this is the one I used)
+
+ **Arduino Nano ESP32:** https://www.amazon.com/dp/B0CXHZXJXP
+
 ### *** At the moment it takes about 35 seconds to "boot". Just be aware when you don't see any activity at first. ***
 
 If you have multiple gameID consoles on when the Clown Car (CC) is booting, the console furthest up the "consoles" list wins. After that it keeps track of the order.
