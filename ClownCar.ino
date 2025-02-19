@@ -94,7 +94,8 @@ const int gameDBlen = sizeof(gameDB) / sizeof(gameDB[0]); // length of gameDB...
 
 void setup(){
 
-  wifiMulti.addAP("SSID","password"); // Wifi creds go here. I believe it only works for 2.4ghz wifi not 5Ghz
+  wifiMulti.addAP("SSID","password"); // WiFi creds go here. MUST be a 2.4GHz WiFi AP, NOT 5GHz. Not supported by the Nano ESP32 unfortunately.
+  WiFi.setHostname("clowncar.local"); // set hostname, call it whatever you like!
 
   usbHost.begin(115200); // leave at 115200 for RT4K connection
 
