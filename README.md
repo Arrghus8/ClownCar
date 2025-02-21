@@ -9,8 +9,7 @@ See it in action: https://youtu.be/ldbfFbKzjh8
 <br /><br />
 
 ## Parts used:
-  - **OTG Adapter:** https://www.aliexpress.us/item/3256806692568661.html
- (not all OTG adapters work, this is the one I used)
+  - **OTG Adapter:** https://www.amazon.com/dp/B0CQKXWRNF (18w version, not 60w, and not all OTG adapters work, this one works the best)
   - **Arduino Nano ESP32:** https://www.amazon.com/dp/B0CXHZXJXP
  <br /><br />
 
