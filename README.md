@@ -9,7 +9,9 @@ See it in action: https://youtu.be/ldbfFbKzjh8
 <br /><br />
 
 ## Parts used:
-  - **OTG Adapter:** https://www.amazon.com/dp/B0CQKXWRNF (18w version, not 60w, and not all OTG adapters work, this one works the best)
+  - **OTG Adapter:** https://www.amazon.com/dp/B0CQKXWRNF
+     - 18w version, not 60w
+     - not all OTG adapters work, this one works the best
   - **Arduino Nano ESP32:** https://www.amazon.com/dp/B0CXHZXJXP
  <br /><br />
 
@@ -19,7 +21,7 @@ See it in action: https://youtu.be/ldbfFbKzjh8
 |PS1Digital | yes, confirmed first hand | |
 |N64Digital | yes, confirmed first hand | |
 | MemCardPro 2 | yes, for GameCube, betting the same for PS |
-| Fenrir ?| | pls, someone make this happen :)|
+| Fenrir ?| | |
 | more on the way... |  
 
 ### LED activity:
@@ -89,7 +91,7 @@ wifiMulti.addAP("SSID","password");
 
 ## TroubleShooting ##
 
-The GREEN and BLUE leds indicate WiFi and usb serial/gameID lookup respectively. This should help diagnose as a first step.
+The <code style="color : green">GREEN</code> and <code style="color : blue">BLUE</code> leds indicate WiFi and usb serial/gameID lookup respectively. This should help diagnose as a first step.
 
 After that, confirm the following:
  - Configured Wifi settings in .ino.
