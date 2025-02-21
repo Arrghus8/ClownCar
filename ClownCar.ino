@@ -26,7 +26,7 @@
 
 WiFiMulti wifiMulti;
 
-uint16_t currentProf[2] = {1,0};  // first index: 0 = remote button profile,1 = SVS profiles. second index: profile number
+uint16_t currentProf = 0;  // current SVS profile number
 unsigned long currentGameTime = 0;
 unsigned long prevGameTime = 0;
 
@@ -42,13 +42,8 @@ class SerialFTDI : public EspUsbHostSerial_FTDI {
       if (err != ESP_OK && err != ESP_ERR_NOT_FINISHED && err != ESP_ERR_INVALID_STATE) {
         ESP_LOGI("EspUsbHostSerial", "usb_host_transfer_submit() err=%x", err);
       }
-      if(cprof != "null" && currentProf[0] == 0 && currentProf[1] != cprof.toInt()) {
-        currentProf[1] = cprof.toInt();
-        tcprof = "remote prof" + cprof + "\r";
-        submit((uint8_t *)reinterpret_cast<const uint8_t*>(&tcprof[0]), tcprof.length());
-      }
-      else if(cprof != "null" && currentProf[0] == 1 && currentProf[1] != cprof.toInt()){
-        currentProf[1] = cprof.toInt();
+      if(cprof != "null" && currentProf != cprof.toInt()){
+        currentProf = cprof.toInt();
         analogWrite(LED_GREEN,222);
         tcprof = "SVS NEW INPUT=" + cprof + "\r";
         submit((uint8_t *)reinterpret_cast<const uint8_t*>(&tcprof[0]), tcprof.length());
@@ -72,29 +67,32 @@ struct Console {
 };
 
 /*
-////////////////////
-//    CONFIG     //
-//////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//    CONFIG     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 */
 
 Console consoles[] = {{"http://ps1digital.local/gameid",0,0,0}, // you can add more, but stay in this format
-                      {"http://n64digital.local/gameid",0,0,0}
+                   // {"http://ps2digital.local/gameid",0,0,0}, // remove leading "//" to uncomment and enable ps2digital
+                   // {"http://10.0.0.14/api/currentState",0,0,0}, // address format for MemCardPro. replace IP address with your MCP address
+                      {"http://n64digital.local/gameid",0,0,0} // the last one in the list has no "," at the end
                       };
-
-String gameDB[][2] = {{"00000000-00000000---00","7"}, // 7 would translate to a S7_profilename.rt4 named profile under RT4K-SDcard/profile/SVS/
-                      {"XSTATION","8"},               // XSTATION is the gameID from http://ps1digital.local/gameid
+                                                      // {"<GAMEID>","SVS PROFILE #"},
+String gameDB[][2] = {{"00000000-00000000---00","7"}, // 7 is the "SVS PROFILE", would translate to a S7_<USER_DEFINED>.rt4 named profile under RT4K-SDcard/profile/SVS/
+                      {"XSTATION","8"},               // XSTATION is the <GAMEID>
+                      {"E43C9765-05B1C1BE-4A","501"},
+                      {"GFEE0100","503"},
                       {"SCUS-94300","9"}};
 
 // WiFi config is just below
 
-////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 const int consolelen = sizeof(consoles) / sizeof(consoles[0]); // length of consoles DB, used frequently
 const int gameDBlen = sizeof(gameDB) / sizeof(gameDB[0]); // length of gameDB...
 
 void setup(){
-
-  wifiMulti.addAP("SSID","password"); // WiFi creds go here. MUST be a 2.4GHz WiFi AP, NOT 5GHz. Not supported by the Nano ESP32 unfortunately.
+  wifiMulti.addAP("SSID","password"); // WiFi creds go here. MUST be a 2.4GHz WiFi AP. 5GHz is NOT supported by the Nano ESP32.
   WiFi.setHostname("clowncar.local"); // set hostname, call it whatever you like!
 
   usbHost.begin(115200); // leave at 115200 for RT4K connection
@@ -104,7 +102,6 @@ void setup(){
   analogWrite(LED_GREEN,255);
   analogWrite(LED_BLUE,255);
   
-
 }  // end of setup
 
 void loop(){
@@ -114,6 +111,8 @@ void loop(){
   usbHost.task();  // used for RT4K usb serial communications
 
 }  // end of loop()
+
+
 
 int fetchGameIDProf(String gameID){ // looks at gameDB for a gameID -> profile match, returns -1 if nothing found
   for(int i = 0; i < gameDBlen; i++){
@@ -129,11 +128,10 @@ void readGameID(){ // queries addresses in "consoles" array for gameIDs
   String payload = "";
   int result = 0;
   for(int i = 0; i < consolelen; i++){
-    //result = 0;
     if((wifiMulti.run() == WL_CONNECTED)){ // wait for WiFi connection
-      analogWrite(LED_BLUE,222);
       HTTPClient http;
       http.begin(consoles[i].Address);
+      analogWrite(LED_BLUE,222);
       int httpCode = http.GET();             // start connection and send HTTP header
       if(httpCode > 0 || httpCode == -11){   // httpCode will be negative on error, let the read error slide...
         if(httpCode == HTTP_CODE_OK){        // console is healthy // HTTP header has been sent and Server response header has been handled
@@ -171,7 +169,7 @@ void readGameID(){ // queries addresses in "consoles" array for gameIDs
         consoles[i].On = 0;
         consoles[i].Prof = 0;
         if(consoles[i].King == 1){
-          currentProf[1] = 0;
+          currentProf = 0;
           usbHost.cprof = String(0);
           for(int k=0;k < consolelen;k++){
 
@@ -206,12 +204,6 @@ void gameIDTimer(uint16_t gTime){
  }
 }  // end of gameIDTimer()
 
-void usendRBP(uint16_t num){ // send Remote Button Profile // not being used atm
-  usbHost.cprof = String(num);
-  currentProf[0] = 0; // 0 is Remote Button Profile
-}
-
 void usendSVS(uint16_t num){ // send SVS Profile
   usbHost.cprof = String(num);
-  currentProf[0] = 1; // 1 is SVS profile
 }
