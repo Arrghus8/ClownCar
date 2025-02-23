@@ -7,6 +7,10 @@ Clown Car is an Arduino Nano ESP32 + OTG adapter that changes profiles for the R
 
 See it in action: https://youtu.be/ldbfFbKzjh8
 <br /><br />
+## Updates:
+  - Detection rates have been sped up!
+    - Unpowered consoles that are DNS address based, timeout after 7 seconds. This is reduced to 2 seconds after a console's first power up.
+      - console DNS addresses will be automatically replaced by IP in order for the 2 second timeout to work.
 
 ## Parts used:
   - **OTG Adapter:** https://www.amazon.com/dp/B0CQKXWRNF
@@ -27,7 +31,7 @@ See it in action: https://youtu.be/ldbfFbKzjh8
 ### LED activity:
 | **Color**    | Blinking | On | Notes |
 | ------------- | ------------- |------------- |------------- |
-|<code style="color : blue">BLUE</code> | WiFi active, querying gameID addresses| long slow blinks is unsuccessful query of gameID address. A powered off console in the list.| |
+|<code style="color : blue">BLUE</code> | WiFi active, querying gameID addresses| Long slow blinks represent an unsuccessful query of gameID address. Usually a powered off console in the list.| |
 |<code style="color : green">GREEN</code> | 1 second blink is gameID match found and SVS profile being sent to RT4K | |  | 
 |<code style="color : red">RED</code> | | Power| No way to control as it's hardwired in. May just need to cover with tape. |
 
@@ -55,7 +59,7 @@ I recommend the [Official Arduino IDE and guide](https://www.arduino.cc/en/Guide
 
 *** At the moment it takes about 25 seconds to "boot". Just be aware when you don't see any activity at first. ***
 
-If you have multiple gameID consoles on when the ClownCar is booting, the console furthest up the "consoles" list wins. After that it keeps track of the order.
+If you have multiple gameID consoles on when the ClownCar is booting, the console furthest down the "consoles" list wins. After that it keeps track of the order.
 
 There are a multiple moving parts with this setup, and if you have issues, please use the "ClownCar_usb-only-test.ino". More info in the troublehshooting section at the end.
 
