@@ -139,7 +139,7 @@ void readGameID(){ // queries addresses in "consoles" array for gameIDs
       if(httpCode > 0 || httpCode == -11){   // httpCode will be negative on error, let the read error slide...
         if(httpCode == HTTP_CODE_OK){        // console is healthy // HTTP header has been sent and Server response header has been handled
 
-          tempStr = replaceHttpDomainWithIP(consoles[i].Address); // replace DNS address with IP in consoles array. this allows setConnectTimeout to be honored
+          tempStr = replaceDNSWithIP(consoles[i].Address); // replace DNS address with IP in consoles array. this allows setConnectTimeout to be honored
           consoles[i].Address = tempStr;
           payload = http.getString();        
           char arr[payload.length()+1]; // prepare MemCardPro check
@@ -210,41 +210,42 @@ void gameIDTimer(uint16_t gTime){
  }
 }  // end of gameIDTimer()
 
-String replaceHttpDomainWithIP(String input) {
+String replaceDNSWithIP(String input){
   String result = input;
 
   int startIndex = 0;
-  while (startIndex < result.length()) {
+  while(startIndex < result.length()){
     // Look for "http://"
-    int httpPos = result.indexOf("http://", startIndex);
+    int httpPos = result.indexOf("http://",startIndex);
     if (httpPos == -1) break;  // No "http://" found
 
     // Set the position right after "http://"
     int domainStart = httpPos + 7;
-    int domainEnd = result.indexOf('/', domainStart);  // Find the end of the domain (start of the path)
+    int domainEnd = result.indexOf('/',domainStart);  // Find the end of the domain (start of the path)
 
-    if (domainEnd == -1) domainEnd = result.length();  // If no path, consider till the end of the string
+    if(domainEnd == -1) domainEnd = result.length();  // If no path, consider till the end of the string
 
-    String domain = result.substring(domainStart, domainEnd);
+    String domain = result.substring(domainStart,domainEnd);
 
     // If the domain is not an IP address, replace it
-    if (!isIPAddress(domain)) {
+    if(!isIPAddress(domain)){
       IPAddress ipAddress;
-      if (WiFi.hostByName(domain.c_str(), ipAddress)) {  // Perform DNS lookup
+      if(WiFi.hostByName(domain.c_str(),ipAddress)){  // Perform DNS lookup
         // Replace the domain with the IP address
-        result.replace(domain, ipAddress.toString());
-      } else {
+        result.replace(domain,ipAddress.toString());
+      }
+      else{
        // Do nothing if DNS lookup fails
       }
     }
 
     startIndex = domainEnd;  // Continue searching after the domain
-  }
+  } // end of while()
 
   return result;
-}
+} // end of replaceDNSWithIP()
 
-bool isIPAddress(String str) {
+bool isIPAddress(String str){
   IPAddress ip;
   return ip.fromString(str);  // Returns true if the string is a valid IP address
 }
