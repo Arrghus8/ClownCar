@@ -7,12 +7,12 @@ Clown Car is an Arduino Nano ESP32 + OTG adapter that changes profiles for the R
 
 See it in action: https://youtu.be/ldbfFbKzjh8
 <br /><br />
-## Updates:
+## Updates
   - Detection rates have been sped up!
     - Unpowered consoles that are DNS address based, timeout after 7 seconds. This is reduced to 2 seconds after a console's first power up.
       - console DNS addresses will be automatically replaced by IP in order for the 2 second timeout to work.
 
-## Parts used:
+## Parts used
   - **OTG Adapter:** https://www.amazon.com/dp/B0CQKXWRNF
      - 18w version, not 60w
      - not all OTG adapters work, this one works the best
@@ -28,7 +28,7 @@ See it in action: https://youtu.be/ldbfFbKzjh8
 | Fenrir ?| | |
 | more on the way... |  
 
-### LED activity:
+### LED activity
 | **Color**    | Blinking | On | Notes |
 | ------------- | ------------- |------------- |------------- |
 |<code style="color : blue">BLUE</code> | WiFi active, querying gameID addresses| Long slow blinks represent an unsuccessful query of gameID address. Usually a powered off console in the list.| |
@@ -72,14 +72,18 @@ Go to: https://github.com/wakwak-koba/EspUsbHost
 
 ## Adding gameIDs
 
-Edit the .ino file to include your gameID addresses and gameID to SVS profile matches. Chances are if this isn't done correctly, it won't compile... which is a good way to know. :)
+Edit the .ino file to include your gameID addresses and gameID to SVS profile matches. Chances are if this isn't done correctly, it won't compile... which is a good way to find out. :)
 ```
 Console consoles[] = {{"http://ps1digital.local/gameid",0,0,0}, // you can add more, but stay in this format
-                      {"http://n64digital.local/gameid",0,0,0}
+                   // {"http://ps2digital.local/gameid",0,0,0}, // remove leading "//" to uncomment and enable ps2digital
+                   // {"http://10.0.0.14/api/currentState",0,0,0}, // address format for MemCardPro. replace IP address with your MCP address
+                      {"http://n64digital.local/gameid",0,0,0} // the last one in the list has no "," at the end
                       };
-
-String gameDB[][2] = {{"00000000-00000000---00","7"}, // 7 is for S7_profilename.rt4
-                      {"XSTATION","8"},               // XSTATION is the gameID from http://ps1digital.local/gameid
+                                                      // {"<GAMEID>","SVS PROFILE #"},
+String gameDB[][2] = {{"00000000-00000000---00","7"}, // 7 is the "SVS PROFILE", would translate to a S7_<USER_DEFINED>.rt4 named profile under RT4K-SDcard/profile/SVS/
+                      {"XSTATION","8"},               // XSTATION is the <GAMEID>
+                      {"E43C9765-05B1C1BE-4A","501"},
+                      {"GFEE0100","503"},
                       {"SCUS-94300","9"}};
 ```
 ## WiFi setup
