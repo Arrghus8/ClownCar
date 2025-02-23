@@ -1,5 +1,5 @@
 /*
-* RT4K ClownCar v0.000002
+* RT4K ClownCar v0.000003
 * Copyright(C) 2025 @Donutswdad
 *
 * This program is free software: you can redistribute it and/or modify
@@ -92,6 +92,7 @@ const int consolelen = sizeof(consoles) / sizeof(consoles[0]); // length of cons
 const int gameDBlen = sizeof(gameDB) / sizeof(gameDB[0]); // length of gameDB...
 
 void setup(){
+
   wifiMulti.addAP("SSID","password"); // WiFi creds go here. MUST be a 2.4GHz WiFi AP. 5GHz is NOT supported by the Nano ESP32.
   WiFi.setHostname("clowncar.local"); // set hostname, call it whatever you like!
 
@@ -106,7 +107,7 @@ void setup(){
 
 void loop(){
 
-  gameIDTimer(5000);  // 5000 == read gameID every 5 seconds
+  gameIDTimer(2000);  // 2000 == read gameID every 2 seconds
 
   usbHost.task();  // used for RT4K usb serial communications
 
@@ -127,14 +128,19 @@ int fetchGameIDProf(String gameID){ // looks at gameDB for a gameID -> profile m
 void readGameID(){ // queries addresses in "consoles" array for gameIDs
   String payload = "";
   int result = 0;
+  String tempStr = "";
   for(int i = 0; i < consolelen; i++){
     if((wifiMulti.run() == WL_CONNECTED)){ // wait for WiFi connection
       HTTPClient http;
+      http.setConnectTimeout(2000); // give only 2 seconds per console to check gameID, is only honored for IP-based addresses
       http.begin(consoles[i].Address);
       analogWrite(LED_BLUE,222);
       int httpCode = http.GET();             // start connection and send HTTP header
       if(httpCode > 0 || httpCode == -11){   // httpCode will be negative on error, let the read error slide...
         if(httpCode == HTTP_CODE_OK){        // console is healthy // HTTP header has been sent and Server response header has been handled
+
+          tempStr = replaceHttpDomainWithIP(consoles[i].Address); // replace DNS address with IP in consoles array. this allows setConnectTimeout to be honored
+          consoles[i].Address = tempStr;
           payload = http.getString();        
           char arr[payload.length()+1]; // prepare MemCardPro check
           strcpy(arr,payload.c_str());
@@ -157,11 +163,11 @@ void readGameID(){ // queries addresses in "consoles" array for gameIDs
           if(consoles[i].Prof != result && result != -1){ // gameID found for console, set as King, unset previous King, send profile change 
             consoles[i].Prof = result;
             consoles[i].King = 1;
-            for(int j=0;j < consolelen;j++){
+            for(int j=0;j < consolelen;j++){ // set previous King to 0
               if(i != j && consoles[j].King == 1)
                 consoles[j].King = 0;
             }
-            usendSVS(consoles[i].Prof);
+            usbHost.cprof = String((consoles[i].Prof)); // previously usendSVS()
           }
        } 
       } // end of if(httpCode > 0 || httpCode == -11)
@@ -175,10 +181,10 @@ void readGameID(){ // queries addresses in "consoles" array for gameIDs
 
             if(i == k){
               consoles[k].King = 0;
-              for(int l=0;l < consolelen;l++){
+              for(int l=0;l < consolelen;l++){ // find next Console that is on
                 if(consoles[l].On == 1){
                   consoles[l].King = 1;
-                  usendSVS(consoles[l].Prof);
+                  usbHost.cprof = String((consoles[l].Prof)); // previously usendSVS()
                   break;
                 }
               }
@@ -204,6 +210,41 @@ void gameIDTimer(uint16_t gTime){
  }
 }  // end of gameIDTimer()
 
-void usendSVS(uint16_t num){ // send SVS Profile
-  usbHost.cprof = String(num);
+String replaceHttpDomainWithIP(String input) {
+  String result = input;
+
+  int startIndex = 0;
+  while (startIndex < result.length()) {
+    // Look for "http://"
+    int httpPos = result.indexOf("http://", startIndex);
+    if (httpPos == -1) break;  // No "http://" found
+
+    // Set the position right after "http://"
+    int domainStart = httpPos + 7;
+    int domainEnd = result.indexOf('/', domainStart);  // Find the end of the domain (start of the path)
+
+    if (domainEnd == -1) domainEnd = result.length();  // If no path, consider till the end of the string
+
+    String domain = result.substring(domainStart, domainEnd);
+
+    // If the domain is not an IP address, replace it
+    if (!isIPAddress(domain)) {
+      IPAddress ipAddress;
+      if (WiFi.hostByName(domain.c_str(), ipAddress)) {  // Perform DNS lookup
+        // Replace the domain with the IP address
+        result.replace(domain, ipAddress.toString());
+      } else {
+       // Do nothing if DNS lookup fails
+      }
+    }
+
+    startIndex = domainEnd;  // Continue searching after the domain
+  }
+
+  return result;
+}
+
+bool isIPAddress(String str) {
+  IPAddress ip;
+  return ip.fromString(str);  // Returns true if the string is a valid IP address
 }
