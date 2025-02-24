@@ -77,7 +77,8 @@ Console consoles[] = {{"http://ps1digital.local/gameid",0,0,0}, // you can add m
                    // {"http://10.0.0.14/api/currentState",0,0,0}, // address format for MemCardPro. replace IP address with your MCP address
                       {"http://n64digital.local/gameid",0,0,0} // the last one in the list has no "," at the end
                       };
-                                                      // {"<GAMEID>","SVS PROFILE #"},
+
+                                 // {"<GAMEID>","SVS PROFILE #"},
 String gameDB[][2] = {{"00000000-00000000---00","7"}, // 7 is the "SVS PROFILE", would translate to a S7_<USER_DEFINED>.rt4 named profile under RT4K-SDcard/profile/SVS/
                       {"XSTATION","8"},               // XSTATION is the <GAMEID>
                       {"E43C9765-05B1C1BE-4A","501"},
@@ -170,7 +171,6 @@ void readGameID(){ // queries addresses in "consoles" array for gameIDs
           currentProf = 0;
           usbHost.cprof = String(0);
           for(int k=0;k < consolelen;k++){
-
             if(i == k){
               consoles[k].King = 0;
               for(int l=0;l < consolelen;l++){ // find next Console that is on
@@ -206,8 +206,7 @@ String replaceDomainWithIP(String input){
   String result = input;
   int startIndex = 0;
   while(startIndex < result.length()){
-    // Look for "http://"
-    int httpPos = result.indexOf("http://",startIndex);
+    int httpPos = result.indexOf("http://",startIndex); // Look for "http://"
     if (httpPos == -1) break;  // No "http://" found
     int domainStart = httpPos + 7; // Set the position right after "http://"
     int domainEnd = result.indexOf('/',domainStart);  // Find the end of the domain (start of the path)
@@ -217,9 +216,6 @@ String replaceDomainWithIP(String input){
       IPAddress ipAddress;
       if(WiFi.hostByName(domain.c_str(),ipAddress)){  // Perform DNS lookup
         result.replace(domain,ipAddress.toString()); // Replace the Domain with the IP address
-      }
-      else{
-       // Do nothing if DNS lookup fails
       }
     }
     startIndex = domainEnd;  // Continue searching after the domain
