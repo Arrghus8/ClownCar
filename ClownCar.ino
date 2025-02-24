@@ -20,8 +20,8 @@
 #include <WiFiMulti.h>
 #include <HTTPClient.h>
 #include <EspUsbHostSerial_FTDI.h> // https://github.com/wakwak-koba/EspUsbHost in order to have FTDI support for the RT4K usb serial port, this is the easist method.
-                                  // Step 1 - Goto the github link above. Click the GREEN "<> Code" box and "Download ZIP"
-                                  // Step 2 - In Arudino IDE; goto "Sketch" -> "Include Library" -> "Add .ZIP Library"
+                                   // Step 1 - Goto the github link above. Click the GREEN "<> Code" box and "Download ZIP"
+                                   // Step 2 - In Arudino IDE; goto "Sketch" -> "Include Library" -> "Add .ZIP Library"
 
 
 WiFiMulti wifiMulti;
@@ -95,9 +95,7 @@ void setup(){
 
   wifiMulti.addAP("SSID","password"); // WiFi creds go here. MUST be a 2.4GHz WiFi AP. 5GHz is NOT supported by the Nano ESP32.
   WiFi.setHostname("clowncar.local"); // set hostname, call it whatever you like!
-
   usbHost.begin(115200); // leave at 115200 for RT4K connection
-
   pinMode(LED_GREEN, OUTPUT); // GREEN led lights up for 1 second when a SVS profile is sent
   pinMode(LED_BLUE, OUTPUT); // BLUE led is a WiFi activity. Long periods of blue means one of the gameID servers is not connecting.
   analogWrite(LED_GREEN,255);
@@ -108,11 +106,9 @@ void setup(){
 void loop(){
 
   gameIDTimer(2000);  // 2000 == read gameID every 2 seconds
-
   usbHost.task();  // used for RT4K usb serial communications
 
 }  // end of loop()
-
 
 
 int fetchGameIDProf(String gameID){ // looks at gameDB for a gameID -> profile match, returns -1 if nothing found
@@ -128,7 +124,6 @@ int fetchGameIDProf(String gameID){ // looks at gameDB for a gameID -> profile m
 void readGameID(){ // queries addresses in "consoles" array for gameIDs
   String payload = "";
   int result = 0;
-  String tempStr = "";
   for(int i = 0; i < consolelen; i++){
     if((wifiMulti.run() == WL_CONNECTED)){ // wait for WiFi connection
       HTTPClient http;
@@ -138,13 +133,10 @@ void readGameID(){ // queries addresses in "consoles" array for gameIDs
       int httpCode = http.GET();             // start connection and send HTTP header
       if(httpCode > 0 || httpCode == -11){   // httpCode will be negative on error, let the read error slide...
         if(httpCode == HTTP_CODE_OK){        // console is healthy // HTTP header has been sent and Server response header has been handled
-
-          tempStr = replaceDNSWithIP(consoles[i].Address); // replace DNS address with IP in consoles array. this allows setConnectTimeout to be honored
-          consoles[i].Address = tempStr;
+          consoles[i].Address = replaceDomainWithIP(consoles[i].Address); // replace Domain with IP in consoles array. this allows setConnectTimeout to be honored
           payload = http.getString();        
           char arr[payload.length()+1]; // prepare MemCardPro check
           strcpy(arr,payload.c_str());
-          
           if(arr[0]=='{'){ // Checking if something starts with {, as typically Memcard Pro devices do.
             char * MCPGID = strtok(arr, ","); // Split at ,
             for(int k = 0; k < 2; k++){
@@ -167,7 +159,7 @@ void readGameID(){ // queries addresses in "consoles" array for gameIDs
               if(i != j && consoles[j].King == 1)
                 consoles[j].King = 0;
             }
-            usbHost.cprof = String((consoles[i].Prof)); // previously usendSVS()
+            usbHost.cprof = String((consoles[i].Prof));
           }
        } 
       } // end of if(httpCode > 0 || httpCode == -11)
@@ -184,7 +176,7 @@ void readGameID(){ // queries addresses in "consoles" array for gameIDs
               for(int l=0;l < consolelen;l++){ // find next Console that is on
                 if(consoles[l].On == 1){
                   consoles[l].King = 1;
-                  usbHost.cprof = String((consoles[l].Prof)); // previously usendSVS()
+                  usbHost.cprof = String((consoles[l].Prof));
                   break;
                 }
               }
@@ -210,40 +202,30 @@ void gameIDTimer(uint16_t gTime){
  }
 }  // end of gameIDTimer()
 
-String replaceDNSWithIP(String input){
+String replaceDomainWithIP(String input){
   String result = input;
-
   int startIndex = 0;
   while(startIndex < result.length()){
     // Look for "http://"
     int httpPos = result.indexOf("http://",startIndex);
     if (httpPos == -1) break;  // No "http://" found
-
-    // Set the position right after "http://"
-    int domainStart = httpPos + 7;
+    int domainStart = httpPos + 7; // Set the position right after "http://"
     int domainEnd = result.indexOf('/',domainStart);  // Find the end of the domain (start of the path)
-
     if(domainEnd == -1) domainEnd = result.length();  // If no path, consider till the end of the string
-
     String domain = result.substring(domainStart,domainEnd);
-
-    // If the domain is not an IP address, replace it
-    if(!isIPAddress(domain)){
+    if(!isIPAddress(domain)){ // If the domain is not an IP address, replace it
       IPAddress ipAddress;
       if(WiFi.hostByName(domain.c_str(),ipAddress)){  // Perform DNS lookup
-        // Replace the domain with the IP address
-        result.replace(domain,ipAddress.toString());
+        result.replace(domain,ipAddress.toString()); // Replace the Domain with the IP address
       }
       else{
        // Do nothing if DNS lookup fails
       }
     }
-
     startIndex = domainEnd;  // Continue searching after the domain
   } // end of while()
-
   return result;
-} // end of replaceDNSWithIP()
+} // end of replaceDomainWithIP()
 
 bool isIPAddress(String str){
   IPAddress ip;
