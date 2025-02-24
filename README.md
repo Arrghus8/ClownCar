@@ -11,6 +11,8 @@ See it in action: https://youtu.be/ldbfFbKzjh8
   - Detection rates have been sped up!
     - Unpowered consoles that are DNS address based, timeout after 7 seconds. This is reduced to 2 seconds after a console's first power up.
       - console DNS addresses will be automatically replaced by IP in order for the 2 second timeout to work.
+    - Quickest if IP address is used versus Domain address.
+      - Ex: http://10.0.1.10/gameid vs http://ps1digital.local/gameid 
 
 ## Parts used
   - **OTG Adapter:** https://www.amazon.com/dp/B0CQKXWRNF
@@ -31,7 +33,7 @@ See it in action: https://youtu.be/ldbfFbKzjh8
 ### LED activity
 | **Color**    | Blinking | On | Notes |
 | ------------- | ------------- |------------- |------------- |
-|<code style="color : blue">BLUE</code> | WiFi active, querying gameID addresses| Long slow blinks represent an unsuccessful query of gameID address. Usually a powered off console in the list.| |
+|<code style="color : blue">BLUE</code> | WiFi active, querying gameID addresses| Longer blinks represent an unsuccessful query of gameID address. Usually a powered off console in the list.| |
 |<code style="color : green">GREEN</code> | 1 second blink is gameID match found and SVS profile being sent to RT4K | |  | 
 |<code style="color : red">RED</code> | | Power| No way to control as it's hardwired in. May just need to cover with tape. |
 
@@ -59,6 +61,10 @@ I recommend the [Official Arduino IDE and guide](https://www.arduino.cc/en/Guide
 
 *** At the moment it takes about 25 seconds to "boot". Just be aware when you don't see any activity at first. ***
 
+For consoles list, quickest if IP address is used versus Domain address:
+  - Ex: http://10.0.1.10/gameid vs http://ps1digital.local/gameid 
+
+<br />
 If you have multiple gameID consoles on when the ClownCar is booting, the console furthest down the "consoles" list wins. After that it keeps track of the order.
 
 There are a multiple moving parts with this setup, and if you have issues, please use the "ClownCar_usb-only-test.ino". More info in the troublehshooting section at the end.
@@ -79,17 +85,19 @@ Console consoles[] = {{"http://ps1digital.local/gameid",0,0,0}, // you can add m
                    // {"http://10.0.0.14/api/currentState",0,0,0}, // address format for MemCardPro. replace IP address with your MCP address
                       {"http://n64digital.local/gameid",0,0,0} // the last one in the list has no "," at the end
                       };
-                                                      // {"<GAMEID>","SVS PROFILE #"},
+
+                                 // {"<GAMEID>","SVS PROFILE #"},
 String gameDB[][2] = {{"00000000-00000000---00","7"}, // 7 is the "SVS PROFILE", would translate to a S7_<USER_DEFINED>.rt4 named profile under RT4K-SDcard/profile/SVS/
                       {"XSTATION","8"},               // XSTATION is the <GAMEID>
                       {"E43C9765-05B1C1BE-4A","501"},
                       {"GFEE0100","503"},
+                      {"SLUS-00214","10"},
                       {"SCUS-94300","9"}};
 ```
 ## WiFi setup
 WiFi is listed just below. **ONLY** compatible with **2.4GHz** WiFi APs. Replace SSID and password with your network's. Make sure to not leave out the "" "" quotes.
 ```
-wifiMulti.addAP("SSID","password");
+WiFi.begin("SSID","password");
 ```
 <br />
 

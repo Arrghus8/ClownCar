@@ -17,14 +17,11 @@
 */
 
 #include <WiFi.h>
-#include <WiFiMulti.h>
 #include <HTTPClient.h>
 #include <EspUsbHostSerial_FTDI.h> // https://github.com/wakwak-koba/EspUsbHost in order to have FTDI support for the RT4K usb serial port, this is the easist method.
                                    // Step 1 - Goto the github link above. Click the GREEN "<> Code" box and "Download ZIP"
                                    // Step 2 - In Arudino IDE; goto "Sketch" -> "Include Library" -> "Add .ZIP Library"
 
-
-WiFiMulti wifiMulti;
 
 uint16_t currentProf = 0;  // current SVS profile number
 unsigned long currentGameTime = 0;
@@ -83,6 +80,7 @@ String gameDB[][2] = {{"00000000-00000000---00","7"}, // 7 is the "SVS PROFILE",
                       {"XSTATION","8"},               // XSTATION is the <GAMEID>
                       {"E43C9765-05B1C1BE-4A","501"},
                       {"GFEE0100","503"},
+                      {"SLUS-00214","10"},
                       {"SCUS-94300","9"}};
 
 // WiFi config is just below
@@ -94,7 +92,7 @@ const int gameDBlen = sizeof(gameDB) / sizeof(gameDB[0]); // length of gameDB...
 
 void setup(){
 
-  wifiMulti.addAP("SSID","password"); // WiFi creds go here. MUST be a 2.4GHz WiFi AP. 5GHz is NOT supported by the Nano ESP32.
+  WiFi.begin("SSID","password"); // WiFi creds go here. MUST be a 2.4GHz WiFi AP. 5GHz is NOT supported by the Nano ESP32.
   WiFi.setHostname("clowncar.local"); // set hostname, call it whatever you like!
   usbHost.begin(115200); // leave at 115200 for RT4K connection
   pinMode(LED_GREEN, OUTPUT); // GREEN led lights up for 1 second when a SVS profile is sent
@@ -126,7 +124,7 @@ void readGameID(){ // queries addresses in "consoles" array for gameIDs
   String payload = "";
   int result = 0;
   for(int i = 0; i < consolelen; i++){
-    if((wifiMulti.run() == WL_CONNECTED)){ // wait for WiFi connection
+    if(WiFi.isConnected()){ // wait for WiFi connection
       HTTPClient http;
       http.setConnectTimeout(2000); // give only 2 seconds per console to check gameID, is only honored for IP-based addresses
       http.begin(consoles[i].Address);
