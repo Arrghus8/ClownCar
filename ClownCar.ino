@@ -124,7 +124,7 @@ void readGameID(){ // queries addresses in "consoles" array for gameIDs
   String payload = "";
   int result = 0;
   for(int i = 0; i < consolelen; i++){
-    if(WiFi.isConnected()){ // wait for WiFi connection
+    if(WiFi.status() == WL_CONNECTED){ // wait for WiFi connection
       HTTPClient http;
       http.setConnectTimeout(2000); // give only 2 seconds per console to check gameID, is only honored for IP-based addresses
       http.begin(consoles[i].Address);
@@ -189,7 +189,7 @@ void readGameID(){ // queries addresses in "consoles" array for gameIDs
   }
 }  // end of readGameID()
 
-void gameIDTimer(uint16_t gTime){
+void gameIDTimer(unsigned long gTime){
   currentGameTime = millis();  // Init timer
   if(prevGameTime == 0)       // If previous timer not initialized, do so now.
     prevGameTime = millis();
