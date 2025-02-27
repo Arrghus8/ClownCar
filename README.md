@@ -89,10 +89,12 @@ Console consoles[] = {{"http://ps1digital.local/gameid",0,0,0}, // you can add m
                                  // {"<GAMEID>","SVS PROFILE #"},
 String gameDB[][2] = {{"00000000-00000000---00","7"}, // 7 is the "SVS PROFILE", would translate to a S7_<USER_DEFINED>.rt4 named profile under RT4K-SDcard/profile/SVS/
                       {"XSTATION","8"},               // XSTATION is the <GAMEID>
-                      {"E43C9765-05B1C1BE-4A","501"},
-                      {"GFEE0100","503"},
-                      {"SLUS-00214","10"},
-                      {"SCUS-94300","9"}};
+                      {"3E5055B6-2E92DA52-N-45","501"}, // N64 MarioKart 64
+                      {"635A2BFF-8B022326-N-45","502"}, // N64 Mario 64
+                      {"DCBC50D1-09FD1AA3-N-45","503"}, // N64 Goldeneye 007
+                      {"492F4B61-04E5146A-N-45","504"}, // N64 Wave Race 64
+                      {"SLUS-00214","10"}, // PS1 Ridge Racer Revolution
+                      {"SCUS-94300","9"}}; // PS1 Ridge Racer
 ```
 ## WiFi setup
 WiFi is listed just below. **ONLY** compatible with **2.4GHz** WiFi APs. Replace SSID and password with your network's. Make sure to not leave out the "" "" quotes.
