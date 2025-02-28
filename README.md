@@ -33,7 +33,7 @@ See it in action: https://youtu.be/ldbfFbKzjh8
 ### LED activity
 | **Color**    | Blinking | On | Notes |
 | ------------- | ------------- |------------- |------------- |
-|<code style="color : blue">BLUE</code> | WiFi active, querying gameID addresses| Longer blinks represent an unsuccessful query of gameID address. Usually a powered off console in the list.| |
+|<code style="color : blue">BLUE</code> | WiFi active, querying gameID addresses| Longer blinks represent an unsuccessful query of gameID address. Usually a powered off console in the list.| After initial power, no blue light means WiFi not found. |
 |<code style="color : green">GREEN</code> | 1 second blink is gameID match found and SVS profile being sent to RT4K | |  | 
 |<code style="color : red">RED</code> | | Power| No way to control as it's hardwired in. May just need to cover with tape. |
 
