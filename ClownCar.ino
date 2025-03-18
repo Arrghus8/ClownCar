@@ -1,5 +1,5 @@
 /*
-* RT4K ClownCar v0.000003
+* RT4K ClownCar v0.000004
 * Copyright(C) 2025 @Donutswdad
 *
 * This program is free software: you can redistribute it and/or modify
@@ -22,6 +22,15 @@
                                    // Step 1 - Goto the github link above. Click the GREEN "<> Code" box and "Download ZIP"
                                    // Step 2 - In Arudino IDE; goto "Sketch" -> "Include Library" -> "Add .ZIP Library"
 
+/*
+////////////////////
+//    OPTIONS    //
+//////////////////
+*/
+
+bool VGASerial = true; // Use onboard TX1 pin to send Serial Commands to RT4K.
+
+//////////////////
 
 uint16_t currentProf = 0;  // current SVS profile number
 unsigned long currentGameTime = 0;
@@ -97,6 +106,11 @@ void setup(){
   WiFi.begin("SSID","password"); // WiFi creds go here. MUST be a 2.4GHz WiFi AP. 5GHz is NOT supported by the Nano ESP32.
   WiFi.setHostname("clowncar.local"); // set hostname, call it whatever you like!
   usbHost.begin(115200); // leave at 115200 for RT4K connection
+  if(VGASerial){
+    Serial0.begin(9600);
+    while(!Serial0){;}   // allow connection to establish before continuing
+    Serial0.print(F("\r")); // clear RT4K Serial buffer
+  }
   pinMode(LED_GREEN, OUTPUT); // GREEN led lights up for 1 second when a SVS profile is sent
   pinMode(LED_BLUE, OUTPUT); // BLUE led is a WiFi activity. Long periods of blue means one of the gameID servers is not connecting.
   analogWrite(LED_GREEN,255);
@@ -161,6 +175,7 @@ void readGameID(){ // queries addresses in "consoles" array for gameIDs
                 consoles[j].King = 0;
             }
             usbHost.cprof = String((consoles[i].Prof));
+            if(VGASerial)sendSVS(consoles[i].Prof);
           }
        } 
       } // end of if(httpCode > 0 || httpCode == -11)
@@ -177,6 +192,7 @@ void readGameID(){ // queries addresses in "consoles" array for gameIDs
                 if(consoles[l].On == 1){
                   consoles[l].King = 1;
                   usbHost.cprof = String((consoles[l].Prof));
+                  if(VGASerial)sendSVS(consoles[l].Prof);
                   break;
                 }
               }
@@ -226,4 +242,16 @@ String replaceDomainWithIP(String input){
 bool isIPAddress(String str){
   IPAddress ip;
   return ip.fromString(str);  // Returns true if the string is a valid IP address
+}
+
+void sendSVS(uint16_t num){
+  analogWrite(LED_GREEN,222);
+  Serial0.print(F("SVS NEW INPUT="));
+  Serial0.print(num);
+  Serial0.println(F("\r"));
+  delay(1000);
+  Serial0.print(F("SVS CURRENT INPUT="));
+  Serial0.print(num);
+  Serial0.println(F("\r"));
+  analogWrite(LED_GREEN,255);
 }
