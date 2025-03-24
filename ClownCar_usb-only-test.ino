@@ -3,7 +3,7 @@
                                   // Step 2 - In Arudino IDE; goto "Sketch" -> "Include Library" -> "Add .ZIP Library"
 
 class SerialFTDI : public EspUsbHostSerial_FTDI {
-  void onNew() override {
+  virtual void onNew() override {
     submit((uint8_t *)"remote prof8\r", 13); // make sure to keep the \r at the end if changing the command
   }
 };
