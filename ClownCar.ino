@@ -1,5 +1,5 @@
 /*
-* RT4K ClownCar v0.000004
+* RT4K ClownCar v0.000005
 * Copyright(C) 2025 @Donutswdad
 *
 * This program is free software: you can redistribute it and/or modify
@@ -41,7 +41,7 @@ class SerialFTDI : public EspUsbHostSerial_FTDI {
   public:
   String cprof = "null";
   String tcprof = "null";
-  void task(void) override {
+  virtual void task(void) override {
     EspUsbHost::task();
     if (this->isReady()) {
       esp_err_t err = usb_host_transfer_submit(this->usbTransfer_recv);
