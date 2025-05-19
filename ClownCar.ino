@@ -1,5 +1,5 @@
 /*
-* RT4K ClownCar v0.000005
+* RT4K ClownCar v0.1
 * Copyright(C) 2025 @Donutswdad
 *
 * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
 * along with this program.  If not,see <http://www.gnu.org/licenses/>.
 */
 
+#include <Arduino_JSON.h>
 #include <WiFi.h>
 #include <HTTPClient.h>
 #include <EspUsbHostSerial_FTDI.h> // https://github.com/wakwak-koba/EspUsbHost in order to have FTDI support for the RT4K usb serial port, this is the easist method.
@@ -28,7 +29,7 @@
 //////////////////
 */
 
-bool VGASerial = true; // Use onboard TX1 pin to send Serial Commands to RT4K.
+bool VGASerial = false; // Use onboard TX1 pin to send Serial Commands to RT4K.
 
 //////////////////
 
@@ -79,6 +80,7 @@ struct Console {
 */
 
 Console consoles[] = {{"http://ps1digital.local/gameid",0,0,0}, // you can add more, but stay in this format
+                      {"http://10.0.1.53/api/currentState",0,0,0},
                    // {"http://ps2digital.local/gameid",0,0,0}, // remove leading "//" to uncomment and enable ps2digital
                    // {"http://10.0.0.14/api/currentState",0,0,0}, // address format for MemCardPro. replace IP address with your MCP address
                       {"http://n64digital.local/gameid",0,0,0} // the last one in the list has no "," at the end
@@ -87,6 +89,7 @@ Console consoles[] = {{"http://ps1digital.local/gameid",0,0,0}, // you can add m
                                  // {"<GAMEID>","SVS PROFILE #"},
 String gameDB[][2] = {{"00000000-00000000---00","7"}, // 7 is the "SVS PROFILE", would translate to a S7_<USER_DEFINED>.rt4 named profile under RT4K-SDcard/profile/SVS/
                       {"XSTATION","8"},               // XSTATION is the <GAMEID>
+                      {"GM4E0100","505"},             // GameCube
                       {"3E5055B6-2E92DA52-N-45","501"}, // N64 MarioKart 64
                       {"635A2BFF-8B022326-N-45","502"}, // N64 Mario 64
                       {"DCBC50D1-09FD1AA3-N-45","503"}, // N64 Goldeneye 007
@@ -150,20 +153,11 @@ void readGameID(){ // queries addresses in "consoles" array for gameIDs
         if(httpCode == HTTP_CODE_OK){        // console is healthy // HTTP header has been sent and Server response header has been handled
           consoles[i].Address = replaceDomainWithIP(consoles[i].Address); // replace Domain with IP in consoles array. this allows setConnectTimeout to be honored
           payload = http.getString();        
-          char arr[payload.length()+1]; // prepare MemCardPro check
-          strcpy(arr,payload.c_str());
-          if(arr[0]=='{'){ // Checking if something starts with {, as typically Memcard Pro devices do.
-            char * MCPGID = strtok(arr, ","); // Split at ,
-            for(int k = 0; k < 2; k++){
-              if(k==1){ // After the first comma,
-                MCPGID = strtok(NULL, ":"); // Continue splitting string at :
-                MCPGID = strtok(NULL, ","); // Continue splitting string at ,
-                break; // Break outta here
-              }
-            }           
-            strcpy(MCPGID-1, MCPGID+1); // Remove leading space and ""
-            MCPGID[strlen(MCPGID)-1]='\0'; // Terminate the string
-            payload = MCPGID;
+          JSONVar MCPjson = JSON.parse(payload); // 
+          if(JSON.typeof(MCPjson) != "undefined"){ // If the response is JSON, continue
+            if(MCPjson.hasOwnProperty("gameID")){  // If JSON contains gameID, reset payload to it's value
+              payload = (const char*) MCPjson["gameID"];
+            }
           }
           result = fetchGameIDProf(payload);
           consoles[i].On = 1;
