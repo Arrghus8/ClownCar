@@ -1,5 +1,5 @@
 /*
-* RT4K ClownCar v0.2a
+* RT4K ClownCar v0.2b
 * Copyright(C) 2025 @Donutswdad
 *
 * This program is free software: you can redistribute it and/or modify
@@ -29,16 +29,19 @@
 //////////////////
 */
 
-bool const VGASerial = false; // Use onboard TX1 pin to send Serial Commands to RT4K.
+bool const VGASerial = false;    // Use onboard TX1 pin to send Serial Commands to RT4K.
 
 bool const S0_pwr = true;        // When all consoles defined below are off, S0_<whatever>.rt4 profile will load
-                              
-bool const S0_gameID = true;     // When a gameID match is not found for a powered on console, S0_<whatever>.rt4 profile will load                        
+
+
+bool const S0_gameID = true;     // When a gameID match is not found for a powered on console, S0_gameID_prof will load
+
+int const  S0_gameID_prof = 0;    // SVS profile that loads when no matching gameID is found, if SO_gameID is set to true
 
 
 //////////////////
 
-uint16_t currentProf = 99999;  // current SVS profile number
+uint16_t currentProf = 33333;  // current SVS profile number, set high initially
 unsigned long currentGameTime = 0;
 unsigned long prevGameTime = 0;
 
@@ -142,7 +145,7 @@ int fetchGameIDProf(String gameID){ // looks at gameDB for a gameID -> profile m
    }
   }
   if(S0_gameID){
-    return 0;
+    return S0_gameID_prof;
   }
   else{
     return -1;
@@ -185,10 +188,10 @@ void readGameID(){ // queries addresses in "consoles" array for gameIDs
       } // end of if(httpCode > 0 || httpCode == -11)
       else{ // console is off, set attributes to 0, find a console that is On starting at the top of the gameID list, set as King, send profile
         consoles[i].On = 0;
-        consoles[i].Prof = 99999;
+        consoles[i].Prof = 33333;
         if(consoles[i].King == 1){
-          currentProf = 99999;
-          usbHost.cprof = String(99999);
+          currentProf = 33333;
+          usbHost.cprof = String(33333);
           for(int k=0;k < consolelen;k++){
             if(i == k){
               consoles[k].King = 0;
