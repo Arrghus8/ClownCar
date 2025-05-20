@@ -1,5 +1,5 @@
 /*
-* RT4K ClownCar v0.1
+* RT4K ClownCar v0.2a
 * Copyright(C) 2025 @Donutswdad
 *
 * This program is free software: you can redistribute it and/or modify
@@ -31,7 +31,10 @@
 
 bool const VGASerial = false; // Use onboard TX1 pin to send Serial Commands to RT4K.
 
-bool const S0  = true;        // Profile 0 - when all consoles defined below are off, S0_<whatever>.rt4 profile will load
+bool const S0_pwr = true;        // When all consoles defined below are off, S0_<whatever>.rt4 profile will load
+                              
+bool const S0_gameID = true;     // When a gameID match is not found for a powered on console, S0_<whatever>.rt4 profile will load                        
+
 
 //////////////////
 
@@ -137,8 +140,13 @@ int fetchGameIDProf(String gameID){ // looks at gameDB for a gameID -> profile m
       return gameDB[i][1].toInt();
       break;
    }
- }
- return -1;
+  }
+  if(S0_gameID){
+    return 0;
+  }
+  else{
+    return -1;
+  }
 }  // end of fetchGameIDProf()
 
 void readGameID(){ // queries addresses in "consoles" array for gameIDs
@@ -200,7 +208,7 @@ void readGameID(){ // queries addresses in "consoles" array for gameIDs
         for(int m=0;m < consolelen;m++){
           if(consoles[m].On == 0) count++;
         }
-        if(count == consolelen && S0){
+        if(count == consolelen && S0_pwr){
           usbHost.cprof = "0";
           if(VGASerial)sendSVS(0);
         }   
