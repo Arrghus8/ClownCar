@@ -1,5 +1,5 @@
 /*
-* RT4K ClownCar v0.2b
+* RT4K ClownCar v0.2c
 * Copyright(C) 2025 @Donutswdad
 *
 * This program is free software: you can redistribute it and/or modify
@@ -33,10 +33,7 @@ bool const VGASerial = false;    // Use onboard TX1 pin to send Serial Commands 
 
 bool const S0_pwr = true;        // When all consoles defined below are off, S0_<whatever>.rt4 profile will load
 
-
-bool const S0_gameID = true;     // When a gameID match is not found for a powered on console, S0_gameID_prof will load
-
-int const  S0_gameID_prof = 0;    // SVS profile that loads when no matching gameID is found, if SO_gameID is set to true
+bool const S0_gameID = true;     // When a gameID match is not found for a powered on console, DefaultProf for that console will load
 
 
 //////////////////
@@ -76,6 +73,7 @@ SerialFTDI usbHost;
 
 struct Console {
   String Address;
+  int DefaultProf;
   int Prof;
   int On;
   int King;
@@ -86,12 +84,12 @@ struct Console {
 //    CONFIG     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 */
-
-Console consoles[] = {{"http://ps1digital.local/gameid",0,0,0}, // you can add more, but stay in this format
-                      {"http://10.0.1.53/api/currentState",0,0,0},
-                   // {"http://ps2digital.local/gameid",0,0,0}, // remove leading "//" to uncomment and enable ps2digital
-                   // {"http://10.0.0.14/api/currentState",0,0,0}, // address format for MemCardPro. replace IP address with your MCP address
-                      {"http://n64digital.local/gameid",0,0,0} // the last one in the list has no "," at the end
+                   // format as so: {console address, Default Prof for console, current profile state (leave 0), power state (leave 0), active state (leave 0)}
+Console consoles[] = {{"http://ps1digital.local/gameid",103,0,0,0}, // you can add more, but stay in this format
+                      {"http://10.0.1.53/api/currentState",101,0,0,0},
+                   // {"http://ps2digital.local/gameid",102,0,0,0}, // remove leading "//" to uncomment and enable ps2digital
+                   // {"http://10.0.0.14/api/currentState",104,0,0,0}, // address format for MemCardPro. replace IP address with your MCP address
+                      {"http://n64digital.local/gameid",105,0,0,0} // the last one in the list has no "," at the end
                       };
 
                                  // {"<GAMEID>","SVS PROFILE #"},
@@ -137,15 +135,15 @@ void loop(){
 }  // end of loop()
 
 
-int fetchGameIDProf(String gameID){ // looks at gameDB for a gameID -> profile match, returns -1 if nothing found
-  for(int i = 0; i < gameDBlen; i++){
-    if(gameDB[i][0] == gameID){
+int fetchGameIDProf(String gameID,int dp){ // looks at gameDB for a gameID -> profile match
+  for(int i = 0; i < gameDBlen; i++){      // returns "DefaultProf" for console if nothing found and S0_gameID = true
+    if(gameDB[i][0] == gameID){            // returns "-1" (meaning dont change anything) if nothing found and S0_gameID = false
       return gameDB[i][1].toInt();
       break;
    }
   }
   if(S0_gameID){
-    return S0_gameID_prof;
+    return dp;
   }
   else{
     return -1;
@@ -172,7 +170,7 @@ void readGameID(){ // queries addresses in "consoles" array for gameIDs
               payload = (const char*) MCPjson["gameID"];
             }
           }
-          result = fetchGameIDProf(payload);
+          result = fetchGameIDProf(payload,consoles[i].DefaultProf);
           consoles[i].On = 1;
           if(consoles[i].Prof != result && result != -1){ // gameID found for console, set as King, unset previous King, send profile change 
             consoles[i].Prof = result;
