@@ -26,7 +26,7 @@ See it in action: https://youtu.be/ldbfFbKzjh8
 | ------------- | ------------- |------------- |
 |PS1Digital | yes, confirmed first hand | |
 |N64Digital | yes, confirmed first hand | |
-| MemCardPro 2 | yes, for GameCube and PS2, betting the same for PS1 |
+| MemCardPro 2 | yes, for GameCube, PS1, & PS2 | |
 | Fenrir ?| | |
 | more on the way... |  
 
