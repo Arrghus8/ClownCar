@@ -78,16 +78,10 @@ Go to: https://github.com/wakwak-koba/EspUsbHost
 
 <br />
 
-## Adding gameIDs
+## Adding gameIDs, Consoles, and other Options
 
 Edit the .ino file to include your gameID addresses and gameID to SVS profile matches. Chances are if this isn't done correctly, it won't compile... which is a good way to find out. :)
 ```
-Console consoles[] = {{"http://ps1digital.local/gameid",0,0,0}, // you can add more, but stay in this format
-                   // {"http://ps2digital.local/gameid",0,0,0}, // remove leading "//" to uncomment and enable ps2digital
-                   // {"http://10.0.0.14/api/currentState",0,0,0}, // address format for MemCardPro. replace IP address with your MCP address
-                      {"http://n64digital.local/gameid",0,0,0} // the last one in the list has no "," at the end
-                      };
-
                                  // {"<GAMEID>","SVS PROFILE #"},
 String gameDB[][2] = {{"00000000-00000000---00","7"}, // 7 is the "SVS PROFILE", would translate to a S7_<USER_DEFINED>.rt4 named profile under RT4K-SDcard/profile/SVS/
                       {"XSTATION","8"},               // XSTATION is the <GAMEID>
@@ -97,6 +91,27 @@ String gameDB[][2] = {{"00000000-00000000---00","7"}, // 7 is the "SVS PROFILE",
                       {"492F4B61-04E5146A-N-45","504"}, // N64 Wave Race 64
                       {"SLUS-00214","10"}, // PS1 Ridge Racer Revolution
                       {"SCUS-94300","9"}}; // PS1 Ridge Racer
+
+
+// format as so: {console address, Default Profile for console (choose a SVS profile #), current profile state (leave 0), power state (leave 0), active state (leave 0)}
+Console consoles[] = {{"http://ps1digital.local/gameid",103,0,0,0}, // you can add more, but stay in this format
+                      {"http://10.0.1.53/api/currentState",101,0,0,0},
+                   // {"http://ps2digital.local/gameid",102,0,0,0}, // remove leading "//" to uncomment and enable ps2digital
+                   // {"http://10.0.0.14/api/currentState",104,0,0,0}, // address format for MemCardPro. replace IP address with your MCP address
+                      {"http://n64digital.local/gameid",105,0,0,0} // the last one in the list has no "," at the end
+                      };
+
+/*
+////////////////////
+//    OPTIONS    //
+//////////////////
+*/
+
+bool const VGASerial = false;    // Use onboard TX1 pin to send Serial Commands to RT4K.
+
+bool const S0_pwr = true;        // When all consoles defined below are off, S0_<whatever>.rt4 profile will load
+
+bool const S0_gameID = true;     // When a gameID match is not found for a powered on console, DefaultProf for that console will load
 ```
 ## WiFi setup
 WiFi is listed just below. **ONLY** compatible with **2.4GHz** WiFi APs. Replace SSID and password with your network's. Make sure to not leave out the "" "" quotes.
