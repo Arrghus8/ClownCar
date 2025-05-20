@@ -29,11 +29,13 @@
 //////////////////
 */
 
-bool VGASerial = false; // Use onboard TX1 pin to send Serial Commands to RT4K.
+bool const VGASerial = false; // Use onboard TX1 pin to send Serial Commands to RT4K.
+
+bool const S0  = true;        // Profile 0 - when all consoles defined below are off, S0_<whatever>.rt4 profile will load
 
 //////////////////
 
-uint16_t currentProf = 0;  // current SVS profile number
+uint16_t currentProf = 99999;  // current SVS profile number
 unsigned long currentGameTime = 0;
 unsigned long prevGameTime = 0;
 
@@ -175,10 +177,10 @@ void readGameID(){ // queries addresses in "consoles" array for gameIDs
       } // end of if(httpCode > 0 || httpCode == -11)
       else{ // console is off, set attributes to 0, find a console that is On starting at the top of the gameID list, set as King, send profile
         consoles[i].On = 0;
-        consoles[i].Prof = 0;
+        consoles[i].Prof = 99999;
         if(consoles[i].King == 1){
-          currentProf = 0;
-          usbHost.cprof = String(0);
+          currentProf = 99999;
+          usbHost.cprof = String(99999);
           for(int k=0;k < consolelen;k++){
             if(i == k){
               consoles[k].King = 0;
@@ -193,7 +195,15 @@ void readGameID(){ // queries addresses in "consoles" array for gameIDs
             }
    
           } // end of for()
-        } // end of if()      
+        } // end of if()
+        int count = 0;
+        for(int m=0;m < consolelen;m++){
+          if(consoles[m].On == 0) count++;
+        }
+        if(count == consolelen && S0){
+          usbHost.cprof = "0";
+          if(VGASerial)sendSVS(0);
+        }   
       } // end of else()
     http.end();
     analogWrite(LED_BLUE, 255);
