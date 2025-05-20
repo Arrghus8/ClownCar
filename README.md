@@ -26,6 +26,8 @@ See it in action: https://youtu.be/ldbfFbKzjh8
 | ------------- | ------------- |------------- |
 |PS1Digital | yes, confirmed first hand | |
 |N64Digital | yes, confirmed first hand | |
+|RetroGEM N64 | yes | |
+|RetroGEM PS1 | yes | |
 | MemCardPro 2 | yes, for GameCube, PS1, & PS2 | |
 | Fenrir ?| | |
 | more on the way... |  
