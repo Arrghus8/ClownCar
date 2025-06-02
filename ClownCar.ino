@@ -1,5 +1,5 @@
 /*
-* RT4K ClownCar v0.2c
+* RT4K ClownCar v0.3
 * Copyright(C) 2025 @Donutswdad
 *
 * This program is free software: you can redistribute it and/or modify
@@ -31,14 +31,21 @@
 
 bool const VGASerial = false;    // Use onboard TX1 pin to send Serial Commands to RT4K.
 
-bool const S0_pwr = true;        // When all consoles defined below are off, S0_<whatever>.rt4 profile will load
+bool const S0_pwr = true;        // Load "S0_pwr_profile" when all consoles defined below are off. Defined below.
+
+int const S0_pwr_profile = 0;    // When all consoles definied below are off, load this profile. set to 0 means that S0_<whatever>.rt4 profile will load.
+                                 // "S0_pwr" must be set true
+                                 //
+                                 // If using a "remote button profile" which are valued 1 - 12, place a "-" before the profile number. 
+                                 // Example: -1 means "remote button profile 1"
+                                 //          -12 means "remote button profile 12"
 
 bool const S0_gameID = true;     // When a gameID match is not found for a powered on console, DefaultProf for that console will load
 
 
 //////////////////
 
-uint16_t currentProf = 33333;  // current SVS profile number, set high initially
+int currentProf = 32222;  // current SVS profile number, set high initially
 unsigned long currentGameTime = 0;
 unsigned long prevGameTime = 0;
 
@@ -57,10 +64,16 @@ class SerialFTDI : public EspUsbHostSerial_FTDI {
       if(cprof != "null" && currentProf != cprof.toInt()){
         currentProf = cprof.toInt();
         analogWrite(LED_GREEN,222);
-        tcprof = "SVS NEW INPUT=" + cprof + "\r";
-        submit((uint8_t *)reinterpret_cast<const uint8_t*>(&tcprof[0]), tcprof.length());
-        delay(1000);
-        tcprof = "SVS CURRENT INPUT=" + cprof + "\r";
+        if(currentProf >= 0){
+          tcprof = "\rSVS NEW INPUT=" + cprof + "\r";
+          submit((uint8_t *)reinterpret_cast<const uint8_t*>(&tcprof[0]), tcprof.length());
+          delay(1000);
+          tcprof = "\rSVS CURRENT INPUT=" + cprof + "\r";
+        }
+        if(currentProf < 0){
+          tcprof = "\rremote prof" + String((-1)*currentProf) + "\r";
+          delay(1000);
+        }
         submit((uint8_t *)reinterpret_cast<const uint8_t*>(&tcprof[0]), tcprof.length());
         analogWrite(LED_GREEN,255);
 
@@ -84,7 +97,15 @@ struct Console {
 //    CONFIG     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 */
-                   // format as so: {console address, Default Prof for console, current profile state (leave 0), power state (leave 0), active state (leave 0)}
+                   // format as so: {console address, Default Profile for console, current profile state (leave 0), power state (leave 0), active state (leave 0)}
+                   //
+                   // If using a "remote button profile" for the "Default Profile" which are valued 1 - 12, place a "-" before the profile number. 
+                   // Example: -1 means "remote button profile 1"
+                   //          -12 means "remote button profile 12"
+                   //            0 means SVS profile 0
+                   //            1 means SVS profile 1
+                   //           12 means SVS profile 12
+                   //           etc...
 Console consoles[] = {{"http://ps1digital.local/gameid",103,0,0,0}, // you can add more, but stay in this format
                       {"http://10.0.1.53/api/currentState",101,0,0,0},
                    // {"http://ps2digital.local/gameid",102,0,0,0}, // remove leading "//" to uncomment and enable ps2digital
@@ -92,7 +113,16 @@ Console consoles[] = {{"http://ps1digital.local/gameid",103,0,0,0}, // you can a
                       {"http://n64digital.local/gameid",105,0,0,0} // the last one in the list has no "," at the end
                       };
 
-                                 // {"<GAMEID>","SVS PROFILE #"},
+
+                   // If using a "remote button profile" for the "PROFILE" which are valued 1 - 12, place a "-" before the profile number. 
+                   // Example: -1 means "remote button profile 1"
+                   //          -12 means "remote button profile 12"
+                   //            0 means SVS profile 0
+                   //            1 means SVS profile 1
+                   //           12 means SVS profile 12
+                   //           etc...
+                   //                      
+                                 // {"<GAMEID>","PROFILE #"},
 String gameDB[][2] = {{"00000000-00000000---00","7"}, // 7 is the "SVS PROFILE", would translate to a S7_<USER_DEFINED>.rt4 named profile under RT4K-SDcard/profile/SVS/
                       {"XSTATION","8"},               // XSTATION is the <GAMEID>
                       {"GM4E0100","505"},             // GameCube
@@ -180,7 +210,7 @@ void readGameID(){ // queries addresses in "consoles" array for gameIDs
                 consoles[j].King = 0;
             }
             usbHost.cprof = String((consoles[i].Prof));
-            if(VGASerial)sendSVS(consoles[i].Prof);
+            if(VGASerial)sendProfile(consoles[i].Prof);
           }
        } 
       } // end of if(httpCode > 0 || httpCode == -11)
@@ -197,7 +227,7 @@ void readGameID(){ // queries addresses in "consoles" array for gameIDs
                 if(consoles[l].On == 1){
                   consoles[l].King = 1;
                   usbHost.cprof = String((consoles[l].Prof));
-                  if(VGASerial)sendSVS(consoles[l].Prof);
+                  if(VGASerial)sendProfile(consoles[l].Prof);
                   break;
                 }
               }
@@ -210,8 +240,8 @@ void readGameID(){ // queries addresses in "consoles" array for gameIDs
           if(consoles[m].On == 0) count++;
         }
         if(count == consolelen && S0_pwr){
-          usbHost.cprof = "0";
-          if(VGASerial)sendSVS(0);
+          usbHost.cprof = String(S0_pwr_profile);
+          if(VGASerial)sendProfile(S0_pwr_profile);
         }   
       } // end of else()
     http.end();
@@ -257,14 +287,21 @@ bool isIPAddress(String str){
   return ip.fromString(str);  // Returns true if the string is a valid IP address
 }
 
-void sendSVS(uint16_t num){
+void sendProfile(int num){
   analogWrite(LED_GREEN,222);
-  Serial0.print(F("SVS NEW INPUT="));
-  Serial0.print(num);
-  Serial0.println(F("\r"));
-  delay(1000);
-  Serial0.print(F("SVS CURRENT INPUT="));
-  Serial0.print(num);
-  Serial0.println(F("\r"));
+  if(num >= 0){
+    Serial0.print(F("\rSVS NEW INPUT="));
+    Serial0.print(num);
+    Serial0.println(F("\r"));
+    delay(1000);
+    Serial0.print(F("\rSVS CURRENT INPUT="));
+    Serial0.print(num);
+    Serial0.println(F("\r"));
+  }
+  else if(num < 0){
+    Serial0.print(F("\rremote prof"));
+    Serial0.print((-1) * num);
+    Serial0.println(F("\r"));
+  }
   analogWrite(LED_GREEN,255);
 }
